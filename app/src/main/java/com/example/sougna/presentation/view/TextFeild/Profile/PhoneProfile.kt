@@ -8,8 +8,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.font.FontWeight
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhoneProfile(
     countryCode: String,
@@ -19,56 +19,61 @@ fun PhoneProfile(
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
-
-    // List of some common country codes
     val countryCodes = listOf("+213", "+1", "+33", "+44", "+49", "+966")
 
-    Column(modifier = modifier.fillMaxWidth()) {
-        Text(
-            text = "Phone Number",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Row(modifier = Modifier.fillMaxWidth()) {
-            // Country Code Dropdown
-            Box(modifier = Modifier.weight(0.3f)) {
-                OutlinedButton(onClick = { expanded = true }) {
-                    Text(text = countryCode)
-                }
-
-                DropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
-                ) {
-                    countryCodes.forEach { code ->
-                        DropdownMenuItem(
-                            text = { Text(code) },
-                            onClick = {
-                                onCountryCodeChange(code)
-                                expanded = false
-                            }
-                        )
-                    }
-                }
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(56.dp), // Ensure both elements have the same height
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        // Country Code Selector
+        Box(
+            modifier = Modifier
+                .weight(0.25f)
+                .height(56.dp) // Align with input field height
+        ) {
+            OutlinedButton(
+                onClick = { expanded = true },
+                modifier = Modifier.fillMaxSize(), // Ensures full height
+                contentPadding = PaddingValues(0.dp) // Remove extra padding
+            ) {
+                Text(text = countryCode, fontSize = 16.sp)
             }
 
-            Spacer(modifier = Modifier.width(8.dp))
-
-            // Phone Number Input
-            OutlinedTextField(
-                value = phoneNumber,
-                onValueChange = { newValue ->
-                    onPhoneNumberChange(newValue.filter { it.isDigit() }.take(10)) // Allow only digits, max 10
-                },
-                placeholder = { Text("Enter phone number") },
-                modifier = Modifier.weight(0.7f),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Phone
-                )
-            )
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                countryCodes.forEach { code ->
+                    DropdownMenuItem(
+                        text = { Text(code) },
+                        onClick = {
+                            onCountryCodeChange(code)
+                            expanded = false
+                        }
+                    )
+                }
+            }
         }
+
+        // Phone Number Input Field
+        OutlinedTextField(
+            value = phoneNumber,
+            onValueChange = { newValue ->
+                onPhoneNumberChange(newValue.filter { it.isDigit() }.take(10)) // Allow only digits
+            },
+            label = { Text("Phone Number") },
+            placeholder = { Text("Enter phone number") },
+            modifier = Modifier
+                .weight(0.75f)
+                .height(56.dp), // Aligns with the button
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+            colors = TextFieldDefaults.outlinedTextFieldColors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                focusedLabelColor = MaterialTheme.colorScheme.primary
+            )
+        )
     }
 }

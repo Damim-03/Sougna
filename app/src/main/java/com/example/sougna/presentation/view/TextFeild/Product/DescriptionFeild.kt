@@ -9,33 +9,32 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.sougna.presentation.viewmodel.AddProductEvent
+import com.example.sougna.presentation.viewmodel.AddProductViewModel
 
 @Composable
 fun DescriptionField(
-    productDescription: String,
-    onDescriptionChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    viewModel: AddProductViewModel = hiltViewModel()
 ) {
+    val state by viewModel.state.collectAsState()
+    val description = state.description
+
     Column(modifier = modifier.fillMaxWidth()) {
-        Text(
-            "Description of Product",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(18.dp))
-
         OutlinedTextField(
-            value = productDescription,
-            onValueChange = onDescriptionChange,
+            value = description,
+            onValueChange = { viewModel.onEvent(AddProductEvent.DescriptionChanged(it)) },
+            label = { Text("Description of Product") }, // ✅ Fix
             placeholder = { Text("Enter Description") },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(120.dp), // Adjusted height for text area
-            maxLines = 5, // Allows multiple lines
+                .height(120.dp),
+            maxLines = 5,
             keyboardOptions = KeyboardOptions.Default.copy(
                 capitalization = KeyboardCapitalization.Sentences
             )
         )
     }
 }
+

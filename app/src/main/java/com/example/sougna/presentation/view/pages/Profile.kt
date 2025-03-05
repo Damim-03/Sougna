@@ -36,28 +36,23 @@ fun ProfilePage(navController: NavHostController) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(170.dp)
-                .background(Color(0xFFE57373), RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp))
+                .height(110.dp)
+                .background(Color(0xFFE57373), RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)),
+            contentAlignment = Alignment.Center
         ) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 30.dp),
+                horizontalArrangement = Arrangement.Center, // Center the buttons
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Spacer(modifier = Modifier.height(20.dp))
-
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 30.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    ProfileButton(onClick = { navController.navigate("profile") })
-                    AddProductButton(navController = navController)
-                }
+                ProfileButton(navController = navController)
+                Spacer(modifier = Modifier.width(16.dp)) // Add spacing between buttons
+                AddProductButton(navController = navController)
             }
         }
+
         Spacer(modifier = Modifier.height(16.dp))
 
         // Profile Image
@@ -79,9 +74,16 @@ fun ProfilePage(navController: NavHostController) {
                 .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Input Fields
             NameProfile(Name = name, onName = { name = it })
+            Spacer(modifier = Modifier.height(12.dp)) // Adds space between fields
+
             EmailProfile(Email = emailAddress, onEmail = { emailAddress = it })
+            Spacer(modifier = Modifier.height(12.dp))
+
             PasswordProfile(Password = password, onPassword = { password = it })
+            Spacer(modifier = Modifier.height(12.dp))
+
             PhoneProfile(
                 countryCode = countryCode,
                 onCountryCodeChange = { countryCode = it },
@@ -89,19 +91,30 @@ fun ProfilePage(navController: NavHostController) {
                 onPhoneNumberChange = { phoneNumber = it }
             )
 
+            Spacer(modifier = Modifier.height(35.dp))
+
+            // Divider
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(1.dp)
+                    .background(Color.LightGray)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Buttons Row
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                CancelButton(navController = navController)
+                SaveButton(onClick = { /* Handle Save Action */ })
+            }
         }
 
-        Spacer(modifier = Modifier.height(35.dp))
 
-        // Buttons
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            CancelButton(navController = navController)
-            SaveButton(onClick = { /* Handle Save Action */ })
-        }
     }
 }

@@ -2,14 +2,16 @@ package com.example.sougna.presentation.view.TextFeild.Profile
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PasswordProfile(
     Password: String,
@@ -18,31 +20,29 @@ fun PasswordProfile(
 ) {
     var passwordVisible by remember { mutableStateOf(false) }
 
-    Column(modifier = modifier.fillMaxWidth()) {
-        Text(
-            "Password",
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        OutlinedTextField(
-            value = Password,
-            onValueChange = onPassword,
-            placeholder = { Text("Enter your password") },
-            modifier = Modifier.fillMaxWidth(),
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Password,
-                imeAction = ImeAction.Done
-            ),
-            trailingIcon = {
-                val icon = if (passwordVisible) "🙈" else "👁️"
-                TextButton(onClick = { passwordVisible = !passwordVisible }) {
-                    Text(icon)
-                }
+    OutlinedTextField(
+        value = Password,
+        onValueChange = onPassword,
+        label = { Text("Password") }, // Floating label effect
+        placeholder = { Text("Enter your password") },
+        modifier = modifier.fillMaxWidth(),
+        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Password,
+            imeAction = ImeAction.Done
+        ),
+        trailingIcon = {
+            IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                Icon(
+                    imageVector = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff,
+                    contentDescription = if (passwordVisible) "Hide password" else "Show password"
+                )
             }
+        },
+        colors = TextFieldDefaults.outlinedTextFieldColors(
+            focusedBorderColor = MaterialTheme.colorScheme.primary,
+            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+            focusedLabelColor = MaterialTheme.colorScheme.primary
         )
-    }
+    )
 }

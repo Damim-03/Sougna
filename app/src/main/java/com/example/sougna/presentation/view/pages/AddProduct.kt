@@ -1,11 +1,15 @@
 package com.example.sougna.presentation.view.pages
 
 import android.net.Uri
+import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -16,55 +20,90 @@ import androidx.navigation.NavHostController
 import com.example.sougna.presentation.view.TextFeild.Product.*
 import com.example.sougna.presentation.view.buttons.ProductButton.*
 import com.example.sougna.presentation.view.buttons.ProfileButton.ProfileButton
-import com.example.sougna.presentation.viewmodel.ProductViewModel
+import com.example.sougna.presentation.view.components.CategoryDropdown
+import com.example.sougna.presentation.viewmodel.AddProductEvent
+import com.example.sougna.presentation.viewmodel.AddProductViewModel
 
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @Composable
 fun AddProductScreen(
     navController: NavHostController,
-    viewModel: ProductViewModel = hiltViewModel() // ✅ Use ProductViewModel
+    viewModel: AddProductViewModel = hiltViewModel()
 ) {
-    var productName by remember { mutableStateOf("") }
-    var productDescription by remember { mutableStateOf("") }
-    var productPrice by remember { mutableStateOf("") }
-    var selectedCurrency by remember { mutableStateOf("USD") }
-    var selectedImages by remember { mutableStateOf<List<Uri?>>(List(3) { null }) }
-    var selectedImageIndex by remember { mutableIntStateOf(0) }
+    val state by viewModel.state.collectAsState()
 
     val imagePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        if (uri != null) {
-            selectedImages = selectedImages.toMutableList().also { it[selectedImageIndex] = uri }
-        }
+        uri?.let { viewModel.onEvent(AddProductEvent.ImageUrlChanged(it.toString())) }
     }
 
     Column(
-        modifier = Modifier.fillMaxSize().background(Color.White)
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
     ) {
         Box(
-            modifier = Modifier.fillMaxWidth().height(120.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(110.dp)
                 .background(Color(0xFFE57373), RoundedCornerShape(bottomStart = 32.dp, bottomEnd = 32.dp)),
-            contentAlignment = Alignment.TopCenter
+            contentAlignment = Alignment.Center
         ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                ProfileButton(onClick = { navController.navigate("profile") })
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 30.dp),
+                horizontalArrangement = Arrangement.Center, // Center the buttons
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ProfileButton(navController = navController)
+                Spacer(modifier = Modifier.width(16.dp)) // Add spacing between buttons
                 AddProductButton(navController = navController)
             }
         }
         Spacer(modifier = Modifier.height(20.dp))
 
         Column(
-            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp)
         ) {
-            NameField(productName, { productName = it })
-            Spacer(modifier = Modifier.height(14.dp))
-            DescriptionField(productDescription, { productDescription = it })
-            Spacer(modifier = Modifier.height(14.dp))
-            PriceField(productPrice, { productPrice = it }, selectedCurrency, { selectedCurrency = it })
-            Spacer(modifier = Modifier.height(25.dp))
+            NameField(
+                modifier = Modifier.fillMaxWidth(),
+                viewModel = viewModel
+            )
 
-            ImagePicker(selectedImages, onImageClick = { index ->
-                selectedImageIndex = index
-                imagePickerLauncher.launch("image/*")
-            })
+            Spacer(modifier = Modifier.height(12.dp))
+
+            DescriptionField(
+                modifier = Modifier.fillMaxWidth(),
+                viewModel = viewModel
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            PriceField(
+                modifier = Modifier.fillMaxWidth(),
+                productPrice = state.price.toString(),
+                onPriceChange = { viewModel.onEvent(AddProductEvent.PriceChanged(it)) },
+                selectedCurrency = "USD",
+                onCurrencyChange = {}
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            CategoryDropdown(
+                selectedCategory = state.categoryId,
+                onCategorySelected = { categoryId ->
+                    viewModel.onEvent(AddProductEvent.CategorySelected(categoryId))
+                }
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            ImagePicker(
+                selectedImages = listOf(Uri.parse(state.imageUrl)),
+                onImageClick = { imagePickerLauncher.launch("image/*") }
+            )
 
             Spacer(modifier = Modifier.height(35.dp))
             Row(
@@ -73,14 +112,25 @@ fun AddProductScreen(
             ) {
                 CancelButton(navController = navController)
                 Spacer(modifier = Modifier.width(16.dp))
-                AddButton(onClick = {
-                    val priceValue = productPrice.toDoubleOrNull()
-                    if (productName.isNotBlank() && priceValue != null) {
-                        viewModel.addProduct(productName, productDescription, priceValue.toString(), selectedImages.firstOrNull()) {
-                            navController.navigate("home")
-                        }
+                AddButton(
+                    onClick = {
+                        viewModel.onEvent(AddProductEvent.Submit)
                     }
-                })
+                )
+            }
+
+            if (state.isLoading) {
+                Text(text = "Adding product...", modifier = Modifier.padding(16.dp))
+            }
+
+            state.error?.let {
+                Text(text = "Error: $it", color = colorScheme.error, modifier = Modifier.padding(16.dp))
+            }
+
+            if (state.isSuccess) {
+                LaunchedEffect(Unit) {
+                    navController.navigate("home")
+                }
             }
         }
     }
