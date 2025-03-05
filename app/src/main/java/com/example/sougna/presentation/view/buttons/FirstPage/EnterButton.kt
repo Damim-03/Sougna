@@ -1,4 +1,4 @@
-package com.example.sougna.presentation.view.buttons
+package com.example.sougna.presentation.view.buttons.FirstPage
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

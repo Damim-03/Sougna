@@ -1,4 +1,4 @@
-package com.example.sougna.presentation.view.buttons
+package com.example.sougna.presentation.view.buttons.FirstPage
 
 import android.app.Activity
 import android.widget.Toast

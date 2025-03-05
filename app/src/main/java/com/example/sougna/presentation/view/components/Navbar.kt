@@ -12,10 +12,11 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.sougna.R
 
 @Composable
-fun Navbar() {
+fun Navbar(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -46,7 +47,7 @@ fun Navbar() {
                 )
             }
 
-            ProfileButton(profileImageId = R.drawable.profile)
+            ProfileButton(profileImageId = R.drawable.profile, navController = navController)
         }
 
         Spacer(modifier = Modifier.height(10.dp))

@@ -1,13 +1,11 @@
 package com.example.sougna
 
+import AppNavigator
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.example.sougna.presentation.view.Navigatore.AppNavigator
 import dagger.hilt.android.AndroidEntryPoint
-
-
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -15,9 +13,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-
-            AppNavigator()
-
-            }
+            AppNavigator() // ✅ Corrected package reference
         }
     }
+}

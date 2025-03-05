@@ -1,4 +1,4 @@
-package com.example.sougna.presentation.view.buttons
+package com.example.sougna.presentation.view.buttons.FirstPage
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
